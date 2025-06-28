@@ -28,25 +28,55 @@ function M.fuzzy_score(text, query)
   if original_text:lower():sub(1, #query) == query then
     score = 10000 + (1000 - #query)
   else
-    local first_pos = positions[1] or #text
-    score = 1000 - first_pos
+    -- Base score: prioritize how much of the query is matched
+    local match_ratio = #positions / #query
+    score = match_ratio * 1000
     
-    -- Reward consecutive matches
+    -- Reward consecutive matches heavily
     local consecutive_bonus = 0
+    local max_consecutive = 1
+    local current_consecutive = 1
+    
     for i = 2, #positions do
       if positions[i] == positions[i-1] + 1 then
-        consecutive_bonus = consecutive_bonus + 10
+        current_consecutive = current_consecutive + 1
+        max_consecutive = math.max(max_consecutive, current_consecutive)
+      else
+        current_consecutive = 1
       end
     end
+    consecutive_bonus = (max_consecutive / #query) * 500
     score = score + consecutive_bonus
     
-    -- Reward matches at word boundaries
+    -- Heavily reward word boundary matches
+    local word_boundary_matches = 0
     for _, pos in ipairs(positions) do
       local char_before = pos > 1 and original_text:sub(pos-1, pos-1) or " "
       if char_before:match("[%s%p]") then
-        score = score + 20
+        word_boundary_matches = word_boundary_matches + 1
       end
     end
+    local word_boundary_bonus = (word_boundary_matches / #positions) * 300
+    score = score + word_boundary_bonus
+    
+    -- Check for complete word matches
+    local words = {}
+    for word in original_text:lower():gmatch("%S+") do
+      table.insert(words, word)
+    end
+    
+    for _, word in ipairs(words) do
+      if word:find(query, 1, true) then -- exact substring match
+        score = score + 200
+        if word == query then -- exact word match
+          score = score + 500
+        end
+      end
+    end
+    
+    -- Small penalty for later first match (less important now)
+    local first_pos = positions[1] or #text
+    score = score - (first_pos * 0.1)
   end
   
   return { score = score, positions = positions }

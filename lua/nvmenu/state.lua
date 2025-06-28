@@ -5,7 +5,8 @@ function M.create_state(lines)
     query = "",
     selected = 1,
     filtered_lines = lines,
-    original_lines = lines
+    original_lines = lines,
+    mode = "input"
   }
 end
 

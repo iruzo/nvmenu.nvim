@@ -40,29 +40,56 @@ end
 function M.update_display(win, buf, state)
   local display_lines = {}
   local window_height = vim.api.nvim_win_get_height(win)
-  
   local max_results = window_height - 2
-  local visible_results = {}
   
-  for i = 1, math.min(#state.filtered_lines, max_results) do
-    table.insert(visible_results, state.filtered_lines[i])
+  -- Calculate scrolling window
+  local total_results = #state.filtered_lines
+  local start_idx = 1
+  local end_idx = math.min(total_results, max_results)
+  
+  -- Implement scrolling based on selection
+  if state.selected > max_results then
+    start_idx = state.selected - max_results + 1
+    end_idx = state.selected
+  elseif state.selected > end_idx then
+    local offset = state.selected - end_idx
+    start_idx = start_idx + offset
+    end_idx = end_idx + offset
   end
   
+  -- Extract visible window of results
+  local visible_results = {}
+  for i = start_idx, end_idx do
+    if state.filtered_lines[i] then
+      table.insert(visible_results, {
+        text = state.filtered_lines[i],
+        original_idx = i
+      })
+    end
+  end
+  
+  -- Fill empty space at top
   local num_empty_lines = max_results - #visible_results
   for i = 1, num_empty_lines do
     table.insert(display_lines, "")
   end
   
-  -- Show best matches at the bottom, with selection indicator
+  -- Add results (best matches at bottom - reverse the visible window)
   for i = #visible_results, 1, -1 do
-    local line = visible_results[i]
-    local prefix = (i == state.selected) and "● " or "  "
-    table.insert(display_lines, prefix .. line)
+    local item = visible_results[i]
+    local is_selected = (item.original_idx == state.selected)
+    local prefix = is_selected and "● " or "  "
+    table.insert(display_lines, prefix .. item.text)
   end
   
+  -- Add search bar
   table.insert(display_lines, "")
-  table.insert(display_lines, "> " .. state.query)
+  local mode_indicator = state.mode == "normal" and "[N]" or ""
+  local scroll_indicator = total_results > max_results and 
+    string.format(" (%d/%d)", state.selected, total_results) or ""
+  table.insert(display_lines, mode_indicator .. "> " .. state.query .. scroll_indicator)
   
+  -- Ensure exact window height
   local current_height = #display_lines
   if current_height < window_height then
     for i = 1, window_height - current_height do
@@ -74,11 +101,15 @@ function M.update_display(win, buf, state)
   vim.api.nvim_buf_set_lines(buf, 0, -1, false, display_lines)
   vim.api.nvim_buf_set_option(buf, 'modifiable', false)
   
+  -- Highlight selected item
   vim.api.nvim_buf_clear_namespace(buf, -1, 0, -1)
-  if state.selected > 0 and state.selected <= #visible_results then
-    local line_nr = num_empty_lines + (#visible_results - state.selected)
-    vim.api.nvim_buf_add_highlight(buf, -1, 'Visual', line_nr, 0, -1)
-    vim.api.nvim_win_set_cursor(win, {line_nr + 1, 0})
+  for i, item in ipairs(visible_results) do
+    if item.original_idx == state.selected then
+      local line_nr = num_empty_lines + (#visible_results - i)
+      vim.api.nvim_buf_add_highlight(buf, -1, 'Visual', line_nr, 0, -1)
+      vim.api.nvim_win_set_cursor(win, {line_nr + 1, 0})
+      break
+    end
   end
 end
 
