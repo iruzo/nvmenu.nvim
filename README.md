@@ -10,7 +10,6 @@ Using [lazy.nvim](https://github.com/folke/lazy.nvim):
 {
   'iruzo/signal.nvim',
   cmd = {'Signal', 'SignalLua', 'SignalShell'},
-  dependencies = { {'nvim-telescope/telescope.nvim', version = '*'} },
   config = function()
     require'signal'
   end
@@ -52,7 +51,7 @@ nvim your_file.txt -c "Signal"
 
 ## How it works
 
-1. Opens Telescope's `current_buffer_fuzzy_find`
+1. Opens the fuzzy finder ui
 2. Optionally processes the selected text with Lua function or shell command
 3. Copies the result to your system clipboard (using the `+` register)
 4. Closes Neovim immediately after selection
