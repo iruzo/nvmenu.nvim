@@ -88,14 +88,14 @@ function M.setup_keymaps(win, buf, state, callbacks)
   vim.keymap.set('n', '<C-d>', function()
     if state.mode == "normal" then
       local half_screen = math.floor((vim.api.nvim_win_get_height(win) - 2) / 2)
-      move_selection(state, win, "up", half_screen, callbacks)
+      move_selection(state, win, "down", half_screen, callbacks)
     end
   end, opts)
   
   vim.keymap.set('n', '<C-u>', function()
     if state.mode == "normal" then
       local half_screen = math.floor((vim.api.nvim_win_get_height(win) - 2) / 2)
-      move_selection(state, win, "down", half_screen, callbacks)
+      move_selection(state, win, "up", half_screen, callbacks)
     else
       state.query = ""
       callbacks.filter_results()
