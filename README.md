@@ -1,4 +1,4 @@
-# signal.nvim
+# nvmenu.nvim
 
 Use your Neovim as a fuzzy finder.
 
@@ -8,10 +8,10 @@ Using [lazy.nvim](https://github.com/folke/lazy.nvim):
 
 ```lua
 {
-  'iruzo/signal.nvim',
-  cmd = {'Signal', 'SignalLua', 'SignalShell'},
+  'iruzo/nvmenu.nvim',
+  cmd = {'Nvmenu', 'NvmenuLua', 'NvmenuShell'},
   config = function()
-    require'signal'
+    require'nvmenu'
   end
 },
 ```
@@ -22,31 +22,31 @@ Using [lazy.nvim](https://github.com/folke/lazy.nvim):
 
 **Simple copy (default):**
 ```vim
-:Signal
+:Nvmenu
 ```
 
 **Process with Lua function:**
 ```vim
-:SignalLua function(text) local parts = vim.split(text, '|', {plain=true}); return parts[2] and parts[2]:gsub(' ', '\n') or text end
+:NvmenuLua function(text) local parts = vim.split(text, '|', {plain=true}); return parts[2] and parts[2]:gsub(' ', '\n') or text end
 ```
 
 **Process with shell command:**
 ```vim
-:SignalShell cut -d'|' -f2 | tr ' ' '\n'
+:NvmenuShell cut -d'|' -f2 | tr ' ' '\n'
 ```
 
 ### Direct Execution with Files
 
-You can use signal.nvim directly when opening files:
+You can use nvmenu.nvim directly when opening files:
 
 **With piped content:**
 ```bash
-cat your_file.txt | nvim -c "Signal"
+cat your_file.txt | nvim -c "Nvmenu"
 ```
 
 **With direct file:**
 ```bash
-nvim your_file.txt -c "Signal"
+nvim your_file.txt -c "Nvmenu"
 ```
 
 ## How it works
@@ -60,15 +60,15 @@ nvim your_file.txt -c "Signal"
 
 **Extract content after delimiter (like `cut -d'|' -f2`):**
 ```vim
-:SignalLua function(text) local parts = vim.split(text, '|', {plain=true}); return parts[2] or text end
+:NvmenuLua function(text) local parts = vim.split(text, '|', {plain=true}); return parts[2] or text end
 ```
 
 **Replace spaces with newlines (like `tr ' ' '\n'`):**
 ```vim
-:SignalLua function(text) return text:gsub(' ', '\n') end
+:NvmenuLua function(text) return text:gsub(' ', '\n') end
 ```
 
 **Combine operations (like `cut -d'|' -f2 | tr ' ' '\n'`):**
 ```vim
-:SignalShell cut -d'|' -f2 | tr ' ' '\n'
+:NvmenuShell cut -d'|' -f2 | tr ' ' '\n'
 ```

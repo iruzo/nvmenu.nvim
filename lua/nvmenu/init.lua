@@ -308,14 +308,14 @@ local function create_fuzzy_finder(process_fn)
 end
 
 -- Simple copy (original behavior)
-function M.signal()
+function M.nvmenu()
   create_fuzzy_finder()
 end
 
 -- Process with Lua function
-function M.signal_lua(lua_code)
+function M.nvmenu_lua(lua_code)
   if not lua_code or lua_code == "" then
-    vim.notify("SignalLua requires a Lua function", vim.log.levels.ERROR)
+    vim.notify("NvmenuLua requires a Lua function", vim.log.levels.ERROR)
     return
   end
 
@@ -337,9 +337,9 @@ function M.signal_lua(lua_code)
 end
 
 -- Process with shell command
-function M.signal_shell(shell_cmd)
+function M.nvmenu_shell(shell_cmd)
   if not shell_cmd or shell_cmd == "" then
-    vim.notify("SignalShell requires a shell command", vim.log.levels.ERROR)
+    vim.notify("NvmenuShell requires a shell command", vim.log.levels.ERROR)
     return
   end
 
