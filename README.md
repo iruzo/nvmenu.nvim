@@ -9,6 +9,7 @@ Using [lazy.nvim](https://github.com/folke/lazy.nvim):
 ```lua
 {
   'iruzo/nvmenu.nvim',
+  version = '*',
   cmd = {'Nvmenu', 'NvmenuLua', 'NvmenuShell'},
   config = function()
     require'nvmenu'
