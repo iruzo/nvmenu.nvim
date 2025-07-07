@@ -2,6 +2,9 @@
 
 Use your Neovim as a fuzzy finder.
 
+## Preview
+![preview](./assets/preview.gif)
+
 ## Installation
 
 Using [lazy.nvim](https://github.com/folke/lazy.nvim):
