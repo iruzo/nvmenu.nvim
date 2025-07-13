@@ -13,10 +13,10 @@ end
 function M.setup_buffer_state(buf)
   local original_modifiable = vim.api.nvim_buf_get_option(buf, 'modifiable')
   local original_readonly = vim.api.nvim_buf_get_option(buf, 'readonly')
-  
+
   vim.api.nvim_buf_set_option(buf, 'modifiable', true)
   vim.api.nvim_buf_set_option(buf, 'readonly', false)
-  
+
   return {
     modifiable = original_modifiable,
     readonly = original_readonly
