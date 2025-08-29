@@ -6,13 +6,18 @@ local keymaps = require('nvmenu.keymaps')
 local state_module = require('nvmenu.state')
 local processor = require('nvmenu.processor')
 
+M.config = {
+  transparent_background = false
+}
+
 local function create_fuzzy_finder(process_fn)
-  -- Make interface transparent - use terminal colors for everything
-  vim.cmd('highlight Normal guibg=NONE ctermbg=NONE')
-  vim.cmd('highlight NonText guibg=NONE ctermbg=NONE')
-  vim.cmd('highlight SignColumn guibg=NONE ctermbg=NONE')
-  vim.cmd('highlight EndOfBuffer guibg=NONE ctermbg=NONE')
-  vim.cmd('highlight Visual guibg=NONE ctermbg=NONE gui=reverse cterm=reverse')
+  if M.config.transparent_background then
+    vim.cmd('highlight Normal guibg=NONE ctermbg=NONE')
+    vim.cmd('highlight NonText guibg=NONE ctermbg=NONE')
+    vim.cmd('highlight SignColumn guibg=NONE ctermbg=NONE')
+    vim.cmd('highlight EndOfBuffer guibg=NONE ctermbg=NONE')
+    vim.cmd('highlight Visual guibg=NONE ctermbg=NONE gui=reverse cterm=reverse')
+  end
 
   -- Disable all events to prevent plugin interference
   vim.o.eventignore = 'all'
@@ -85,6 +90,10 @@ function M.nvmenu_shell(shell_cmd)
   if process_fn then
     create_fuzzy_finder(process_fn)
   end
+end
+
+function M.setup(opts)
+  M.config = vim.tbl_deep_extend('force', M.config, opts or {})
 end
 
 return M
