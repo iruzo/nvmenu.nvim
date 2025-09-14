@@ -61,7 +61,8 @@ function M.update_display(win, buf, state)
   for i = start_idx, end_idx do
     if state.filtered_lines[i] then
       table.insert(visible_results, {
-        text = state.filtered_lines[i],
+        text = state.filtered_lines[i].line,
+        positions = state.filtered_lines[i].positions,
         original_idx = i
       })
     end
@@ -100,14 +101,23 @@ function M.update_display(win, buf, state)
   vim.api.nvim_buf_set_lines(buf, 0, -1, false, display_lines)
   vim.api.nvim_buf_set_option(buf, 'modifiable', false)
 
-  -- Highlight selected item
+  -- Highlight selected item and matched characters
   vim.api.nvim_buf_clear_namespace(buf, -1, 0, -1)
   for i, item in ipairs(visible_results) do
+    local line_nr = num_empty_lines + (#visible_results - i)
+    local prefix_offset = 2 -- Account for "● " or "  " prefix
+    
+    -- Highlight matched characters
+    if item.positions and #item.positions > 0 then
+      for _, pos in ipairs(item.positions) do
+        vim.api.nvim_buf_add_highlight(buf, -1, 'NvmenuMatch', line_nr, prefix_offset + pos - 1, prefix_offset + pos)
+      end
+    end
+    
+    -- Highlight selected item
     if item.original_idx == state.selected then
-      local line_nr = num_empty_lines + (#visible_results - i)
       vim.api.nvim_buf_add_highlight(buf, -1, 'Visual', line_nr, 0, -1)
       vim.api.nvim_win_set_cursor(win, {line_nr + 1, 0})
-      break
     end
   end
 end

@@ -84,7 +84,11 @@ end
 
 function M.filter_and_sort(lines, query)
   if query == "" then
-    return lines
+    local result = {}
+    for _, line in ipairs(lines) do
+      table.insert(result, { line = line, positions = {} })
+    end
+    return result
   end
 
   local scored_lines = {}
@@ -104,7 +108,10 @@ function M.filter_and_sort(lines, query)
 
   local filtered = {}
   for _, item in ipairs(scored_lines) do
-    table.insert(filtered, item.line)
+    table.insert(filtered, {
+      line = item.line,
+      positions = item.positions
+    })
   end
 
   return filtered

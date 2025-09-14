@@ -18,6 +18,9 @@ local function create_fuzzy_finder(process_fn)
     vim.cmd('highlight EndOfBuffer guibg=NONE ctermbg=NONE')
     vim.cmd('highlight Visual guibg=NONE ctermbg=NONE gui=reverse cterm=reverse')
   end
+  
+  -- Create custom highlight for matched characters using theme colors
+  vim.cmd('highlight default link NvmenuMatch Function')
 
   -- Disable all events to prevent plugin interference
   vim.o.eventignore = 'all'
@@ -45,7 +48,7 @@ local function create_fuzzy_finder(process_fn)
 
   local function select_current()
     if #state.filtered_lines > 0 and state.selected > 0 and state.selected <= #state.filtered_lines then
-      local text = state.filtered_lines[state.selected]
+      local text = state.filtered_lines[state.selected].line
 
       if process_fn then
         text = process_fn(text)
