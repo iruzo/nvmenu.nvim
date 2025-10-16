@@ -10,7 +10,7 @@ M.config = {
   transparent_background = false
 }
 
-local function refresh_highlights()
+local function create_fuzzy_finder(process_fn)
   if M.config.transparent_background then
     vim.cmd('highlight Normal guibg=NONE ctermbg=NONE')
     vim.cmd('highlight NonText guibg=NONE ctermbg=NONE')
@@ -18,22 +18,12 @@ local function refresh_highlights()
     vim.cmd('highlight EndOfBuffer guibg=NONE ctermbg=NONE')
     vim.cmd('highlight Visual guibg=NONE ctermbg=NONE gui=reverse cterm=reverse')
   end
-
+  
   -- Create custom highlight for matched characters using theme colors
   vim.cmd('highlight default link NvmenuMatch Function')
-end
 
-local function create_fuzzy_finder(process_fn)
-  refresh_highlights()
-
-  -- Set up autocmd to refresh highlights when colorscheme changes
-  local autocmd_id = vim.api.nvim_create_autocmd("ColorScheme", {
-    callback = refresh_highlights,
-    desc = "Refresh nvmenu highlights on colorscheme change"
-  })
-
-  -- Disable specific events to prevent plugin interference while allowing ColorScheme
-  vim.o.eventignore = 'BufEnter,BufLeave,BufWinEnter,BufWinLeave,WinEnter,WinLeave'
+  -- Disable all events to prevent plugin interference
+  vim.o.eventignore = 'all'
 
   local source_buf = vim.api.nvim_get_current_buf()
   local lines = vim.api.nvim_buf_get_lines(source_buf, 0, -1, false)
@@ -67,13 +57,11 @@ local function create_fuzzy_finder(process_fn)
       vim.fn.setreg('+', text)
     end
 
-    vim.api.nvim_del_autocmd(autocmd_id)
     ui.restore_window_options(original_ui_opts)
     vim.cmd('quit!')
   end
 
   local function close_finder()
-    vim.api.nvim_del_autocmd(autocmd_id)
     ui.restore_window_options(original_ui_opts)
     vim.cmd('quit!')
   end
