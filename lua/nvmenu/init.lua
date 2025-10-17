@@ -7,10 +7,14 @@ local state_module = require('nvmenu.state')
 local processor = require('nvmenu.processor')
 
 M.config = {
-  transparent_background = false
+  transparent_background = false,
+  load_default_theme = false
 }
 
 local function create_fuzzy_finder(process_fn)
+  if M.config.load_default_theme then
+    vim.cmd('colorscheme default')
+  end
   if M.config.transparent_background then
     vim.cmd('highlight Normal guibg=NONE ctermbg=NONE')
     vim.cmd('highlight NonText guibg=NONE ctermbg=NONE')
@@ -18,7 +22,7 @@ local function create_fuzzy_finder(process_fn)
     vim.cmd('highlight EndOfBuffer guibg=NONE ctermbg=NONE')
     vim.cmd('highlight Visual guibg=NONE ctermbg=NONE gui=reverse cterm=reverse')
   end
-  
+
   -- Create custom highlight for matched characters using theme colors
   vim.cmd('highlight default link NvmenuMatch Function')
 

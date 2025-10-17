@@ -14,11 +14,10 @@ Using [lazy.nvim](https://github.com/folke/lazy.nvim):
   'iruzo/nvmenu.nvim',
   version = '*',
   cmd = {'Nvmenu', 'NvmenuLua', 'NvmenuShell'},
-  config = function()
-    require('nvmenu').setup({
-      transparent_background = false, -- Set to true to make background transparent
-    })
-  end
+  opts = {
+    transparent_background = false, -- Set to true to make background transparent
+    load_default_theme = false,     -- Set to true to use default colorscheme
+    }
 },
 ```
 
@@ -78,17 +77,3 @@ nvim your_file.txt -c "Nvmenu"
 ```vim
 :NvmenuShell cut -d'|' -f2 | tr ' ' '\n'
 ```
-
-## Configuration
-
-You can configure nvmenu.nvim by calling the setup function:
-
-```lua
-require('nvmenu').setup({
-  transparent_background = false, -- Set to true to make background transparent (default: false)
-})
-```
-
-### Options
-
-- `transparent_background`: Boolean (default: `false`) - When set to `true`, removes the background color from the interface making it transparent to use terminal colors.
