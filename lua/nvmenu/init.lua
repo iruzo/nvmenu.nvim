@@ -12,22 +12,38 @@ M.config = {
 }
 
 local function create_fuzzy_finder(process_fn)
-  if M.config.load_default_theme then
-    vim.cmd('colorscheme default')
-  end
-  if M.config.transparent_background then
-    vim.cmd('highlight Normal guibg=NONE ctermbg=NONE')
-    vim.cmd('highlight NonText guibg=NONE ctermbg=NONE')
-    vim.cmd('highlight SignColumn guibg=NONE ctermbg=NONE')
-    vim.cmd('highlight EndOfBuffer guibg=NONE ctermbg=NONE')
-    vim.cmd('highlight Visual guibg=NONE ctermbg=NONE gui=reverse cterm=reverse')
+
+  -- Function to apply highlights based on current configuration
+  local function apply_highlights()
+    if M.config.load_default_theme then
+      vim.cmd('colorscheme default')
+    end
+    if M.config.transparent_background then
+      vim.cmd('highlight Normal guibg=NONE ctermbg=NONE')
+      vim.cmd('highlight NonText guibg=NONE ctermbg=NONE')
+      vim.cmd('highlight SignColumn guibg=NONE ctermbg=NONE')
+      vim.cmd('highlight EndOfBuffer guibg=NONE ctermbg=NONE')
+      vim.cmd('highlight Visual guibg=NONE ctermbg=NONE gui=reverse cterm=reverse')
+    end
+    vim.cmd('highlight default link NvmenuMatch Function')
   end
 
-  -- Create custom highlight for matched characters using theme colors
-  vim.cmd('highlight default link NvmenuMatch Function')
+  -- Apply initial highlights
+  apply_highlights()
 
-  -- Disable all events to prevent plugin interference
-  vim.o.eventignore = 'all'
+  -- Disable all events except OptionSet to prevent plugin interference
+  -- OptionSet is needed to dinamically change the colorscheme based on vim.o.background
+  vim.o.eventignore = 'BufNewFile,BufReadPre,BufRead,BufReadPost,BufReadCmd,FileReadPre,FileReadPost,FileReadCmd,FilterReadPre,FilterReadPost,StdinReadPre,StdinReadPost,BufWrite,BufWritePre,BufWritePost,BufWriteCmd,FileWritePre,FileWritePost,FileWriteCmd,FileAppendPre,FileAppendPost,FileAppendCmd,FilterWritePre,FilterWritePost,BufAdd,BufCreate,BufDelete,BufWipeout,BufFilePre,BufFilePost,BufEnter,BufLeave,BufWinEnter,BufWinLeave,BufUnload,BufHidden,BufNew,SwapExists,FileType,Syntax,EncodingChanged,TermChanged,VimResized,FocusGained,FocusLost,CursorHold,CursorHoldI,CursorMoved,CursorMovedI,WinEnter,WinLeave,TabEnter,TabLeave,CmdwinEnter,CmdwinLeave,InsertEnter,InsertChange,InsertLeave,InsertCharPre,TextChanged,TextChangedI,ColorScheme,RemoteReply,QuickFixCmdPre,QuickFixCmdPost,SessionLoadPost,MenuPopup,CompleteDone,User'
+
+  -- Create autocmd to watch for background changes
+  local augroup = vim.api.nvim_create_augroup('NvmenuBackgroundWatch', { clear = true })
+  vim.api.nvim_create_autocmd('OptionSet', {
+    group = augroup,
+    pattern = 'background',
+    callback = function()
+      apply_highlights()
+    end
+  })
 
   local source_buf = vim.api.nvim_get_current_buf()
   local lines = vim.api.nvim_buf_get_lines(source_buf, 0, -1, false)
